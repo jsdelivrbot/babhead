@@ -1,37 +1,171 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
+	<head>
+		<meta charset=utf-8>
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="threejs/three.js"></script>
+		<script>
 
-   <head>
-      <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-      <title>Babylon - Basic scene Johan</title>
-      <script src="babylon/babylon.js"></script>
-      <script src="css/main.css"></script>
-<script src="handjs/hand.js"></script>
-<!--<script src="cannon.js"></script> --> <!-- optional physics engine -->
-<!-- <script src="Oimo.js"></script>  New physics engine -->
+                  // Set the scene size.
+    const WIDTH = window.innerWidth;
+    const HEIGHT = window.innerHeight;
 
-<style>
-      html, body {
-         overflow: hidden;
-         width: 100%;
-         height: 100%;
-         margin: 0;
-         padding: 0;
-      }
-      #renderCanvas {
-         width: 100%;
-         height: 100%;
-         touch-action: none;
-      }
-   </style>
-   </head>
+    // Set some camera attributes.
+    const VIEW_ANGLE = 45;
+    const ASPECT = WIDTH / HEIGHT;
+    const NEAR = 0.1;
+    const FAR = 10000;
 
-   <body>
-       
-       <canvas id="renderCanvas"></canvas>
+    // Get the DOM element to attach to
+    const container =
+        document.querySelector('#container');
 
-      <script src="babylon/babhead.js"></script>
-   </body>
+    // Create a WebGL renderer, camera
+    // and a scene
+    const renderer = new THREE.WebGLRenderer();
+    const camera =
+        new THREE.PerspectiveCamera(
+            VIEW_ANGLE,
+            ASPECT,
+            NEAR,
+            FAR
+        );
 
-      
+    const scene = new THREE.Scene();
+
+    // Add the camera to the scene.
+    scene.add(camera);
+
+    // Start the renderer.
+    renderer.setSize(WIDTH, HEIGHT);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+    // Attach the renderer-supplied
+    // DOM element.
+    document.body.appendChild( renderer.domElement );
+
+    // create a point light
+    const pointLight =
+      new THREE.PointLight( 0xffffff, 1, 5000 );
+
+    // set its position
+    pointLight.position.x = 100;
+    pointLight.position.y = 180;
+    pointLight.position.z = 130;
+      pointLight.castShadow = true; 
+    // add to the scene
+    scene.add(pointLight);
+
+    //Set up shadow properties for the light
+pointLight.shadow.mapSize.width = 2048;  // default
+pointLight.shadow.mapSize.height = 2048; // default
+pointLight.shadow.camera.near = 0.5;       // default
+pointLight.shadow.camera.far = 1000;      // default
+
+// another light
+var light = new THREE.SpotLight( 0xffffff );
+
+// set its position
+    light.position.x = -200;
+    light.position.y = 180;
+    light.position.z = 130;
+      light.castShadow = true; 
+scene.add( light );
+
+//Set up shadow properties for the light
+light.shadow.mapSize.width = 512;  // default
+light.shadow.mapSize.height = 512; // default
+light.shadow.camera.near = 0.5;       // default
+light.shadow.camera.far = 500      // default
+
+    // create the sphere's material
+    const sphereMaterial =
+      new THREE.MeshLambertMaterial(
+        {
+          color: 0xCC0000
+        });
+
+    // Set up the sphere vars
+    const RADIUS = 20;
+    const SEGMENTS = 16;
+    const RINGS = 16;
+
+    // Create a new mesh with
+    // sphere geometry - we will cover
+    // the sphereMaterial next!
+    const sphere = new THREE.Mesh(
+
+      new THREE.SphereGeometry(
+        RADIUS,
+        SEGMENTS,
+        RINGS),
+
+      sphereMaterial);
+
+// Cube
+      const cubeMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+      const cube = new THREE.Mesh(
+
+
+      new THREE.BoxGeometry(
+        RADIUS + 60,
+        SEGMENTS,
+        RINGS),
+
+      cubeMaterial);
+
+    // Move the Sphere back in Z so we
+    // can see it.
+    sphere.position.z = -300;
+    cube.position.z = -300;
+    //cube.position.x = -300;
+
+    // add shadows
+    sphere.castShadow = true; //default is false
+      sphere.receiveShadow = true; //default is false
+      cube.castShadow = true; //default is false
+      cube.receiveShadow = true; //default is false
+
+    // Finally, add the sphere to the scene.
+    scene.add(sphere);
+    scene.add(cube);
+
+    //Create a plane that receives shadows (but does not cast them)
+var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200, 32, 32 );
+var planeMaterial = new THREE.MeshStandardMaterial( { color: sphereMaterial , side: THREE.DoubleSide } )
+var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+plane.receiveShadow = true;
+plane.position.z = -400;
+plane.position.y = -30;
+plane.rotation.x = -20;
+scene.add( plane );
+
+//Create a helper for the shadow camera (optional)
+var helper = new THREE.CameraHelper( pointLight.shadow.camera );
+scene.add( helper );
+
+    function update () {
+          // animate!
+          cube.rotation.x += 0.1;
+            cube.rotation.y += 0.1;
+
+      // Draw!
+      renderer.render(scene, camera);
+
+      // Schedule the next frame.
+      requestAnimationFrame(update);
+    }
+
+    // Schedule the first frame.
+    requestAnimationFrame(update);
+                  
+
+		</script>
+	</body>
 </html>

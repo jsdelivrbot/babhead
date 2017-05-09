@@ -9,13 +9,15 @@
 var scene = new BABYLON.Scene(engine);
 var light = new BABYLON.DirectionalLight("dir01", new BABYLON.Vector3(-1, -2, -1), scene);
 	
-var shadowGenerator = new BABYLON.ShadowGenerator(2048, light);
+var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
 // This begins the creation of a function that we will 'call' just after it's built
   var createScene = function () {
     // Now create a basic Babylon Scene object 
     //var scene = new BABYLON.Scene(engine);
     // Change the scene background color to green.
     scene.clearColor = new BABYLON.Color3(0.2, 0.2, 0.5);
+    scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
+    scene.fogDensity = 0.01;
     /*
     // This creates and positions a free camera
     var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 6, -12), scene);
@@ -41,7 +43,7 @@ var shadowGenerator = new BABYLON.ShadowGenerator(2048, light);
     shadowGenerator.blurScale = 8;
    // shadowGenerator.useBlurExponentialShadowMap = true;
     shadowGenerator.usePoissonSampling = true;
-    
+    //shadowGenerator.bias = 0.01;
 // Objects
     // Let's try our built-in 'sphere' shape. Params: name, subdivisions, size, scene
     var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
@@ -49,6 +51,7 @@ var shadowGenerator = new BABYLON.ShadowGenerator(2048, light);
     sphere.position.y = 1;
     shadowGenerator.getShadowMap().renderList.push(sphere);
 
+    var animationBox = new BABYLON.Animation("myAnimation", "scaling.x", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
 //JOHANS  
   makeBoxesGrid();
 
@@ -56,6 +59,32 @@ var shadowGenerator = new BABYLON.ShadowGenerator(2048, light);
     var ground = BABYLON.Mesh.CreateGround("ground1", 16, 16, 2, scene);
     ground.receiveShadows = true;
 
+// ANIMATION
+// An array with all animation keys
+var keys = []; 
+
+//At the animation key 0, the value of scaling is "1"
+  keys.push({
+    frame: 0,
+    value: 1
+  });
+
+  //At the animation key 20, the value of scaling is "0.2"
+  keys.push({
+    frame: 20,
+    value: 0.2
+  });
+
+  //At the animation key 100, the value of scaling is "1"
+  keys.push({
+    frame: 100,
+    value: 1
+  });
+
+  animationBox.setKeys(keys);
+  sphere.animations = [];
+sphere.animations.push(animationBox);
+scene.beginAnimation(sphere, 0, 100, true);
     
     // Leave this function
     return scene;
